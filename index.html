@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Improvement Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Projects</h2>
+            <ul id="projectList"></ul>
+            <button id="newProjectBtn">+ New Project</button>
+        </aside>
+        <main class="main-content">
+            <div id="projectDetails" class="hidden">
+                <h2 id="projectTitle"></h2>
+                <button id="addTaskBtn">+ Add Task</button>
+                <ul id="taskList"></ul>
+            </div>
+        </main>
+    </div>
+
+    <div id="projectModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>New Project</h3>
+            <input type="text" id="projectName" placeholder="Project Name" />
+            <button id="saveProject">Save</button>
+            <button onclick="closeModal('projectModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>New Task</h3>
+            <input type="text" id="taskName" placeholder="Task Name" />
+            <select id="taskPriority">
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <button id="saveTask">Save</button>
+            <button onclick="closeModal('taskModal')">Cancel</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
