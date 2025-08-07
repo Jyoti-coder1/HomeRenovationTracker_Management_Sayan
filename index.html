@@ -16,6 +16,9 @@
         <main class="main-content">
             <div id="projectDetails" class="hidden">
                 <h2 id="projectTitle"></h2>
+
+                <!--Budget Tracker-->
+                <p>Budget: ₹<span id="projectBudget">0</span></p>
                 <button id="addTaskBtn">+ Add Task</button>
                 <ul id="taskList"></ul>
             </div>
@@ -26,6 +29,7 @@
         <div class="modal-content">
             <h3>New Project</h3>
             <input type="text" id="projectName" placeholder="Project Name" />
+            <input type="number" id="projectBudgetInput" placeholder="Budget (₹)" />
             <button id="saveProject">Save</button>
             <button onclick="closeModal('projectModal')">Cancel</button>
         </div>
@@ -40,6 +44,8 @@
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
             </select>
+            <input type="date" id="taskReminder" />
+            <input type="file" id="taskPhoto" accept="image/*" />
             <button id="saveTask">Save</button>
             <button onclick="closeModal('taskModal')">Cancel</button>
         </div>
