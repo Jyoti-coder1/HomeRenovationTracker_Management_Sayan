@@ -13,20 +13,21 @@ body {
     background-color: #f4f4f4;
     padding: 1rem;
     border-right: 1px solid #ddd;
-}
-
-.sidebar h2 {
-    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .sidebar button {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     width: 100%;
+    cursor: pointer;
 }
 
 .main content {
     flex: 1;
     padding: 1rem;
+    overflow-y: auto;
 }
 
 .hidden {
@@ -56,4 +57,11 @@ li {
     padding: 1rem;
     margin: 10% auto;
     width: 300px;
+}
+
+.card {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: center;
+    width: 150px;
 }

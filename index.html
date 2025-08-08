@@ -8,23 +8,70 @@
 </head>
 <body>
     <div class="container">
+        <!--Sidebar Navigation-->
         <aside class="sidebar">
-            <h2>Projects</h2>
-            <ul id="projectList"></ul>
-            <button id="newProjectBtn">+ New Project</button>
+            <h2>Menu</h2>
+            <button onclick="showSection('projectSection')">Projects</button>
+            <button onclick="showSection('inventorySection')">Inventory</button>
+            <button onclick="showSection('contractorSection')">Contractors</button>
+            <button onclick="showSection('inspirationSection')">Inspiration</button>
         </aside>
-        <main class="main-content">
-            <div id="projectDetails" class="hidden">
-                <h2 id="projectTitle"></h2>
 
-                <!--Budget Tracker-->
-                <p>Budget: ₹<span id="projectBudget">0</span></p>
-                <button id="addTaskBtn">+ Add Task</button>
-                <ul id="taskList"></ul>
-            </div>
+        <!--Main Content Sections-->
+        <main class="main-content">
+            
+            <!--Project Section-->
+            <section id="projectsSection" class="section">
+                <h2>Projects</h2>
+                <ul id="projectList"></ul>
+                <button id="newProjectBtn">+ New Project</button>
+
+                <div id="projectDetails" class="hidden">
+                    <h3 id="projectTitle"></h3>
+
+                    <!--Budget Tracker-->
+                    <p>Budget: ₹<span id="projectBudget">0</span></p>
+                    <button id="addTaskBtn">+ Add Task</button>
+                    <ul id="taskList"></ul>
+                </div>
+            </section>
+
+            <!--Inventory Section-->
+            <section id="inventorySection" class="section hidden">
+                <h2>Inventory</h2>
+                <ul id="inventoryList"></ul>
+                <button id="newInventoryBtn">+ Add Item</button>
+            </section>
+
+            <!--Contractor Section-->
+            <section id="contractorSection" class="section hidden">
+                <h2>Contractors</h2>
+                <ul id="contractorList"></ul>
+                <button id="newContractorBtn">+ Add Contractor</button>
+            </section>
+
+            <!--Inspiration section-->
+            <section id="inspirationSection" class="section hidden">
+                <h2>Inspiration</h2>
+                <div class="gallery">
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/19227209/pexels-photo-19227209.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Modern Kitchen">
+                        <p>Modern Kitchen Design Ideas</p>
+                    </div>
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/7851906/pexels-photo-7851906.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Cozy Living Room">
+                        <p>Cozy Living Room Makeover</p>
+                    </div>
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/19227243/pexels-photo-19227243.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Bathroom Upgrade">
+                        <p>Luxury Bathroom Upgrade</p>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
+    <!--Project Modal-->   
     <div id="projectModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Project</h3>
@@ -35,10 +82,12 @@
         </div>
     </div>
 
+    <!--Task Modal-->
     <div id="taskModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Task</h3>
             <input type="text" id="taskName" placeholder="Task Name" />
+            <input type="text" id="taskCollaborator" placeholder="Collaborator Name" />
             <select id="taskPriority">
                 <option value="High">High</option>
                 <option value="Medium">Medium</option>
@@ -48,6 +97,28 @@
             <input type="file" id="taskPhoto" accept="image/*" />
             <button id="saveTask">Save</button>
             <button onclick="closeModal('taskModal')">Cancel</button>
+        </div>
+    </div>
+    
+    <!--Inventory Modal-->
+    <div id="inventoryModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>New Inventory Item</h3>
+            <input type="text" id="inventoryName" placeholder="Item Name" />
+            <input type="number" id="inventoryQty" placeholder="Quantity" />
+            <button id="saveInventory">Save</button>
+            <button onclick="closeModal('inventoryModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!--Contractor Modal-->
+    <div id="contractorModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>New Contractor</h3>
+            <input type="text" id="contractorName" placeholder="Name" />
+            <textarea id="contractorNotes" placeholder="Notes"></textarea>
+            <button id="saveContractor">Save</button>
+            <button onclick="closeModal('contractorModal')"></button>
         </div>
     </div>
 
