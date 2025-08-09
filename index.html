@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Improvement Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <!--jsPDF for export-->
+    
 </head>
 <body>
     <div class="container">
         <!--Sidebar Navigation-->
         <aside class="sidebar">
             <h2>Menu</h2>
-            <button onclick="showSection('projectSection')">Projects</button>
+            <button onclick="showSection('projectsSection')">Projects</button>
             <button onclick="showSection('inventorySection')">Inventory</button>
-            <button onclick="showSection('contractorSection')">Contractors</button>
+            <button onclick="showSection('contractorsSection')">Contractors</button>
             <button onclick="showSection('inspirationSection')">Inspiration</button>
+            <button onclick="showSection('maintenanceSection')">Maintenance</button>
         </aside>
 
         <!--Main Content Sections-->
@@ -31,6 +34,16 @@
 
                     <!--Budget Tracker-->
                     <p>Budget: ₹<span id="projectBudget">0</span></p>
+
+                    <div class="project-extras">
+                        <button id="exportPdfBtn">Export Project to PDF</button>
+                        <div class="permit-section">
+                            <h4>Permit Checklist</h4>
+                            <ul id="permitList"></ul>
+                            <input type="text" id="newPermitName" placeholder="Permit name (e.g. Building Permit)" />
+                            <button id="addPermitBtn">Add Permit</button>
+                        </div>
+                    </div>
                     <button id="addTaskBtn">+ Add Task</button>
                     <ul id="taskList"></ul>
                 </div>
@@ -43,8 +56,8 @@
                 <button id="newInventoryBtn">+ Add Item</button>
             </section>
 
-            <!--Contractor Section-->
-            <section id="contractorSection" class="section hidden">
+            <!--Contractors Section-->
+            <section id="contractorsSection" class="section hidden">
                 <h2>Contractors</h2>
                 <ul id="contractorList"></ul>
                 <button id="newContractorBtn">+ Add Contractor</button>
@@ -67,6 +80,23 @@
                         <p>Luxury Bathroom Upgrade</p>
                     </div>
                 </div>
+            </section>
+
+            <!--Maintenance Section-->
+            <section id="maintenanceSection" class="section hidden">
+                <h2>Maintenance Scheduler</h2>
+                <ul id="maintenanceList"></ul>
+
+                <h4>Add Maintenance Task</h4>
+                <input type="text" id="maintenanceName" placeholder="Task (e.g. Clean gutters)" />
+                <input type="date" id="maintenanceStart" />
+                <select id="maintenanceFreq">
+                    <option value="none">One-time</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+                <button id="addMaintenanceBtn">Add Maintenance</button>
             </section>
         </main>
     </div>
@@ -116,9 +146,11 @@
         <div class="modal-content">
             <h3>New Contractor</h3>
             <input type="text" id="contractorName" placeholder="Name" />
+            <input type="tel" id="contractorPhone" placeholder="Phone" />
+            <input type="email" id="contractorEmail" placeholder="Email" />
             <textarea id="contractorNotes" placeholder="Notes"></textarea>
             <button id="saveContractor">Save</button>
-            <button onclick="closeModal('contractorModal')"></button>
+            <button onclick="closeModal('contractorModal')">Cancel</button>
         </div>
     </div>
 

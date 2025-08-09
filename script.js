@@ -1,139 +1,191 @@
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
-let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
-let contractors = JSON.parse(localStorage.getItem("contractors")) || [];
+// Initialize data arrays with fallback empty arrays
+let projects = [];
+let inventory = [];
+let contractors = [];
+let maintenance = [];
 let selectedProjectIndex = null;
 
-function saveData() {
+// Load saved data from localStorage safely
+try {
+    projects = JSON.parse(localStorage.getItem("projects")) || [];
+} catch {
+    projects = [];
+}
+try {
+    inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+} catch {
+    inventory = [];
+}
+try {
+    contractors = JSON.parse(localStorage.getItem("contractors")) || [];
+} catch {
+    contractors = [];
+}
+try {
+    maintenance = JSON.parse(localStorage.getItem("maintenance")) || [];
+} catch {
+    maintenance = [];
+}
+
+// Save all data helper
+function saveAll() {
     localStorage.setItem("projects", JSON.stringify(projects));
     localStorage.setItem("inventory", JSON.stringify(inventory));
     localStorage.setItem("contractors", JSON.stringify(contractors));
+    localStorage.setItem("maintenance", JSON.stringify(maintenance));
 }
 
-// Modal functions
+// Modal helpers
 function openModal(id) {
     document.getElementById(id).classList.remove("hidden");
 }
 
 function closeModal(id) {
     document.getElementById(id).classList.add("hidden");
+    resetModalInputs(id);
 }
 
+function resetModalInputs(modalId) {
+    document.querySelectorAll(`#${modalId} input, #${modalId} textarea, #${modalId} select`).forEach(el => {
+        if (el.type === "file") el.value = "";
+        else if (el.tagName === "SELECT") el.selectedIndex = 0;
+        else el.value = "";
+    });
+}
 function showSection(id) {
     document.querySelectorAll(".section").forEach(sec => sec.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
 
-//Projects
+// --- DOM refs (projects)
 const projectList = document.getElementById("projectList");
 const projectTitle = document.getElementById("projectTitle");
 const projectBudget = document.getElementById("projectBudget");
 const taskList = document.getElementById("taskList");
 
+// Wire buttons for opening modals
 document.getElementById("newProjectBtn").onclick = () => openModal("projectModal");
+document.getElementById("newInventoryBtn").onclick = () => openModal("inventoryModal");
+document.getElementById("newContractorBtn").onclick = () => openModal("contractorModal");
+
+// Save new project
 document.getElementById("saveProject").onclick = () => {
     const name = document.getElementById("projectName").value.trim();
     const budget = parseFloat(document.getElementById("projectBudgetInput").value) || 0;
     if (name) {
-        projects.push({ name, budget, collaborator, tasks: [] });
-        saveData();
+        projects.push({ name, budget, tasks: [], permits: [] });
+        saveAll();
         renderProjects();
         closeModal("projectModal");
+    } else {
+        alert("Project name is required");
     }
 };
 
-
-// Render Projects
+// Render projects list
 function renderProjects() {
     projectList.innerHTML = "";
     projects.forEach((p, i) => {
         const li = document.createElement("li");
         li.textContent = p.name;
-        li.onclick = () => selectProject(i);
+        li.style.cursor = "pointer";
+        li.onclick = () => { selectProject(i); showSection('projectsSection'); };
         projectList.appendChild(li);
     });
 }
 
-// Select Project
+// Select and show project details
 function selectProject(i) {
     selectedProjectIndex = i;
     const p = projects[i];
     projectTitle.textContent = p.name;
-    projectBudget.textContent = p.budget.toFixed(2);
-    renderTasks(p.tasks);
+    projectBudget.textContent = (p.budget || 0).toFixed(2);
+    renderTasks(p.tasks || []);
     document.getElementById("projectDetails").classList.remove("hidden");
+    // Remember last
+    localStorage.setItem('lastProject', i);
+    renderPermits();
 }
 
-// Render Tasks
+// Render tasks for selected project
 function renderTasks(tasks) {
     taskList.innerHTML = "";
     tasks.forEach((t, i) => {
         const li = document.createElement("li");
         li.innerHTML = `
-            <strong>${t.name}</strong> [${t.priority}] - collaborator: ${t.collaborator || "N/A"}</br>
-            Reminder: ${t.reminder || "None"}
-            ${t.photo ? `</br><img src="${t.photo}" width="100" />` : ""}
+            <strong>${t.name}</strong> [${t.priority}] - Collaborator: ${t.collaborator || "N/A"}<br/>
+            Reminder: ${t.reminder || "None"} 
+            ${t.photo ? `<br/><img src="${t.photo}" width="100"/>` : ""}
             <br/>
-            <input type="checkbox" ${t.completed ? "checked" : ""} onchange="toggleTask(${i})" />
+            <input type="checkbox" ${t.completed ? "checked" : ""} onchange="toggleTask(${i})"/>
             <button onclick="deleteTask(${i})">🗑</button>
         `;
         taskList.appendChild(li);
     });
 }
 
-// Add Task
-document.getElementById("addTaskBtn").onclick = () => openModal("taskModal");
+// Add task button opens task modal
+document.getElementById("addTaskBtn").onclick = () => {
+    if (selectedProjectIndex === null) return alert("Select a project first.");
+    openModal("taskModal");
+};
+
+// Save new task
 document.getElementById("saveTask").onclick = () => {
     const name = document.getElementById("taskName").value.trim();
-    const collaborator = document.getElementById("taskCollaborators").value.trim();
+    const collaborator = document.getElementById("taskCollaborator").value.trim();
     const priority = document.getElementById("taskPriority").value;
     const reminder = document.getElementById("taskReminder").value;
-    const photoInput = document.getElementById("taskPhoto").files[0];
-    if (!name || selectedProjectIndex === null) return;
-    const task = { name, priority, reminder, completed: false };
-    if (photoInput) {
+    const photoFile = document.getElementById("taskPhoto").files[0];
+    if (!name || selectedProjectIndex === null) return alert("Task name and a project are required.");
+
+    const task = { name, collaborator, priority, reminder, completed: false };
+    if (photoFile) {
         const reader = new FileReader();
         reader.onload = e => {
             task.photo = e.target.result;
             addTask(task);
         };
-        reader.readAsDataURL(photoInput);
-    }
-    else {
+        reader.readAsDataURL(photoFile);
+    } else {
         addTask(task);
     }
 };
 
 function addTask(task) {
     projects[selectedProjectIndex].tasks.push(task);
-    saveData();
+    saveAll();
     renderTasks(projects[selectedProjectIndex].tasks);
     closeModal("taskModal");
 }
 
-// Delete Task
-function deleteTask(index) {
-    projects[selectedProjectIndex].tasks.splice(index, 1);
-    saveData();
+//Delete Task
+function deleteTask(i) {
+    if (!confirm("Delete this task?")) return;
+    projects[selectedProjectIndex].tasks.splice(i, 1);
+    saveAll();
     renderTasks(projects[selectedProjectIndex].tasks);
 }
 
-// Toggle Completion
-function toggleTask(index) {
-    const task = projects[selectedProjectIndex].tasks[index];
+//Toggle completion
+function toggleTask(i) {
+    const task = projects[selectedProjectIndex].tasks[i];
     task.completed = !task.completed;
-    saveData();
+    saveAll();
 }
 
-//Inventory
+// --- Inventory ---
 document.getElementById("newInventoryBtn").onclick = () => openModal("inventoryModal");
 document.getElementById("saveInventory").onclick = () => {
     const name = document.getElementById("inventoryName").value.trim();
     const qty = parseInt(document.getElementById("inventoryQty").value) || 0;
     if (name) {
         inventory.push({ name, qty });
-        saveData();
+        saveAll();
         renderInventory();
         closeModal("inventoryModal");
+    } else {
+        alert("Item name is required");
     }
 };
 function renderInventory() {
@@ -141,10 +193,11 @@ function renderInventory() {
     list.innerHTML = "";
     inventory.forEach((item, i) => {
         const li = document.createElement("li");
-        li.innerHTML = `${item.name} - Qty: ${item.qty}
-        <button onclick="editInventory(${i})">✏</button>
-        <button onclick="deleteInventory(${i})">🗑</button>
-        )`;
+        li.innerHTML = `
+            ${item.name} - Qty: ${item.qty} 
+            <button onclick="editInventory(${i})">✏</button> 
+            <button onclick="deleteInventory(${i})">🗑</button>
+        `;
         list.appendChild(li);
     });
 }
@@ -154,17 +207,17 @@ function editInventory(i) {
     if (newName !== null && newQty !== null) {
         inventory[i].name = newName.trim();
         inventory[i].qty = parseInt(newQty) || 0;
-        saveData();
+        saveAll();
         renderInventory();
-  }
+    }
 }
 function deleteInventory(i) {
     if (confirm("Delete this inventory item?")) {
         inventory.splice(i, 1);
-        saveData();
+        saveAll();
         renderInventory();
     }
-} 
+}
 
 // --- Contractors ---
 document.getElementById("newContractorBtn").onclick = () => openModal("contractorModal");
@@ -175,45 +228,240 @@ document.getElementById("saveContractor").onclick = () => {
     const notes = document.getElementById("contractorNotes").value.trim();
     if (name) {
         contractors.push({ name, phone, email, notes });
-        saveData();
+        saveAll();
         renderContractors();
         closeModal("contractorModal");
+    } else {
+        alert("Contractor name is required");
     }
 };
 function renderContractors() {
     const list = document.getElementById("contractorList");
     list.innerHTML = "";
     contractors.forEach((c, i) => {
-        list.innerHTML += `<li><strong>${c.name}</strong> - ${c.phone} - ${c.email}<br/>
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <strong>${c.name}</strong> - ${c.phone} - ${c.email}<br/>
             ${c.notes || ""}
-            <br/><button onclick="editContractor(${i})">✏</button>
-            <button onclick="deleteContractor(${i})">🗑</button></li>
+            <br/>
+            <button onclick="editContractor(${i})">✏</button> 
+            <button onclick="deleteContractor(${i})">🗑</button>
         `;
-  });
+        list.appendChild(li);
+    });
 }
 function editContractor(i) {
-  const newName = prompt("Edit contractor name:", contractors[i].name);
-  const newPhone = prompt("Edit phone:", contractors[i].phone);
-  const newEmail = prompt("Edit email:", contractors[i].email);
-  const newNotes = prompt("Edit notes:", contractors[i].notes);
-  if (newName !== null) {
-    contractors[i].name = newName.trim();
-    contractors[i].phone = newPhone.trim();
-    contractors[i].email = newEmail.trim();
-    contractors[i].notes = newNotes.trim();
-    saveData();
-    renderContractors();
-  }
+    const newName = prompt("Edit contractor name:", contractors[i].name);
+    const newPhone = prompt("Edit phone:", contractors[i].phone);
+    const newEmail = prompt("Edit email:", contractors[i].email);
+    const newNotes = prompt("Edit notes:", contractors[i].notes);
+    if (newName !== null) {
+        contractors[i].name = newName.trim();
+        contractors[i].phone = newPhone.trim();
+        contractors[i].email = newEmail.trim();
+        contractors[i].notes = newNotes.trim();
+        saveAll();
+        renderContractors();
+    }
 }
 function deleteContractor(i) {
-  if (confirm("Delete this contractor?")) {
-    contractors.splice(i, 1);
-    saveData();
-    renderContractors();
-  }
+    if (confirm("Delete this contractor?")) {
+        contractors.splice(i, 1);
+        saveAll();
+        renderContractors();
+    }
 }
 
-// Initial render
+// --- Permits ---
+function renderPermits() {
+    if (selectedProjectIndex === null) return;
+    const list = document.getElementById("permitList");
+    list.innerHTML = "";
+    const proj = projects[selectedProjectIndex];
+    proj.permits = proj.permits || [];
+
+    proj.permits.forEach((p, idx) => {
+        const li = document.createElement("li");
+        li.className = "permit-item";
+        li.innerHTML = `
+            <input type="checkbox" id="permit_${idx}" ${p.obtained ? "checked" : ""} onchange="togglePermit(${idx})" />
+            <label for="permit_${idx}">${p.name}</label>
+            <button onclick="removePermit(${idx})">🗑</button>
+        `;
+        list.appendChild(li);
+    });
+}
+function addPermit() {
+    const nameEl = document.getElementById("newPermitName");
+    const name = nameEl.value.trim();
+    if (!name || selectedProjectIndex === null) return alert("Add a permit name and select a project.");
+    const proj = projects[selectedProjectIndex];
+    proj.permits = proj.permits || [];
+    proj.permits.push({ name, obtained: false });
+    saveAll();
+    renderPermits();
+    nameEl.value = "";
+}
+function togglePermit(idx) {
+    const proj = projects[selectedProjectIndex];
+    proj.permits[idx].obtained = !proj.permits[idx].obtained;
+    saveAll();
+    renderPermits();
+}
+function removePermit(idx) {
+    const proj = projects[selectedProjectIndex];
+    if (confirm("Remove this permit?")) {
+        proj.permits.splice(idx, 1);
+        saveAll();
+        renderPermits();
+    }
+}
+
+// --- Maintenance(global) ---
+function renderMaintenance() {
+    const list = document.getElementById("maintenanceList");
+    list.innerHTML = "";
+    maintenance.forEach((m, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <strong>${m.name}</strong> — Next due: ${m.nextDue || m.startDate || "N/A"}<br>
+            Frequency: ${m.freq}<br/>
+            <button onclick="editMaintenance(${i})">✏</button> 
+            <button onclick="deleteMaintenance(${i})">🗑</button>
+        `;
+        list.appendChild(li);
+    });
+}
+function addMaintenance() {
+    const name = document.getElementById("maintenanceName").value.trim();
+    const startDate = document.getElementById("maintenanceStart").value;
+    const freq = document.getElementById("maintenanceFreq").value;
+    if (!name || !startDate) return alert("Provide name and start date.");
+    const nextDue = startDate;
+    maintenance.push({ name, startDate, freq, nextDue });
+    saveAll();
+    renderMaintenance();
+    // Clear inputs manually here because maintenance inputs are not in a modal
+    document.getElementById("maintenanceName").value = "";
+    document.getElementById("maintenanceStart").value = "";
+    document.getElementById("maintenanceFreq").selectedIndex = 0;
+}
+function editMaintenance(i) {
+    const item = maintenance[i];
+    const newName = prompt("Task name:", item.name) || item.name;
+    const newStart = prompt("Start date (YYYY-MM-DD):", item.startDate) || item.startDate;
+    const newFreq = prompt("Frequency (none, monthly, quarterly, yearly):", item.freq) || item.freq;
+    item.name = newName.trim();
+    item.startDate = newStart;
+    item.freq = newFreq;
+    item.nextDue = newStart;
+    saveAll();
+    renderMaintenance();
+}
+function deleteMaintenance(i) {
+    if (confirm("Delete maintenance task?")) {
+        maintenance.splice(i, 1);
+        saveAll();
+        renderMaintenance();
+    }
+}
+function addMonths(dateStr, months) {
+    const d = new Date(dateStr);
+    d.setMonth(d.getMonth() + months);
+    return d.toISOString().slice(0, 10);
+}
+function checkMaintenanceDue() {
+    const today = new Date().toISOString().slice(0, 10);
+    maintenance.forEach((m) => {
+        if (!m.nextDue) return;
+        if (m.nextDue <= today) {
+            alert(`🔧 Maintenance due: ${m.name} (due ${m.nextDue})`);
+            if (m.freq === "monthly") m.nextDue = addMonths(m.nextDue, 1);
+            else if (m.freq === "quarterly") m.nextDue = addMonths(m.nextDue, 3);
+            else if (m.freq === "yearly") m.nextDue = addMonths(m.nextDue, 12);
+            else m.nextDue = null;
+            saveAll();
+            renderMaintenance();
+        }
+    });
+}
+function scheduleMaintenanceChecks() {
+    checkMaintenanceDue();
+    setInterval(checkMaintenanceDue, 60 * 1000);
+}
+
+// Export project to PDF
+async function exportProjectToPDF() {
+    if (selectedProjectIndex === null) return alert("Select a project to export.");
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const proj = projects[selectedProjectIndex];
+    let y = 10;
+    doc.setFontSize(16);
+    doc.text(`Project: ${proj.name}`, 10, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.text(`Budget: ₹${proj.budget}`, 10, y);
+    y += 8;
+
+    if (proj.permits && proj.permits.length) {
+        doc.text("Permits:", 10, y);
+        y += 6;
+        proj.permits.forEach(p => {
+            doc.text(`- ${p.name} : ${p.obtained ? "Obtained" : "Required"}`, 12, y);
+            y += 6;
+            if (y > 270) { doc.addPage(); y = 10; }
+        });
+    }
+
+    if (proj.tasks && proj.tasks.length) {
+        doc.text("Tasks:", 10, y);
+        y += 6;
+        for (const t of proj.tasks) {
+            doc.text(`- ${t.name} [${t.priority}] - Collaborator: ${t.collaborator || "N/A"}`, 12, y);
+            y += 6;
+            if (t.reminder) {
+                doc.text(`  Reminder: ${t.reminder}`, 14, y);
+                y += 6;
+            }
+            if (t.photo) {
+                try {
+                    const imgProps = doc.getImageProperties(t.photo);
+                    const width = Math.min(120, imgProps.width * 0.2);
+                    const height = (imgProps.height / imgProps.width) * width;
+                    if (y + height > 280) { doc.addPage(); y = 10; }
+                    doc.addImage(t.photo, 'JPEG', 12, y, width, height);
+                    y += height + 6;
+                } catch (err) {
+                    console.warn("Image skipped in PDF", err);
+                    doc.text("  [Image omitted]", 14, y);
+                    y += 6;
+                }
+            }
+            if (y > 270) { doc.addPage(); y = 10; }
+        }
+    }
+
+    const safeName = proj.name.replace(/\s+/g, '_').toLowerCase();
+    doc.save(`${safeName}_report.pdf`);
+}
+
+// Event wiring
+document.getElementById("addPermitBtn").addEventListener("click", addPermit);
+document.getElementById("addMaintenanceBtn").addEventListener("click", addMaintenance);
+document.getElementById("exportPdfBtn").addEventListener("click", exportProjectToPDF);
+
+// Remember last opened project (optional)
+const last = localStorage.getItem('lastProject');
+if (last !== null) {
+    const idx = parseInt(last);
+    if (projects[idx]) selectProject(idx);
+}
+
+// Initial render calls
 renderProjects();
 renderInventory();
 renderContractors();
+renderMaintenance();
+scheduleMaintenanceChecks();

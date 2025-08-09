@@ -19,9 +19,13 @@ body {
 }
 
 .sidebar button {
-    margin-top: 0.5rem;
     width: 100%;
+    padding: 0.5rem;
     cursor: pointer;
+    border: 0;
+    background: #fff;
+    border-radius: 4px;
+    text-align: left;
 }
 
 .main content {
@@ -30,8 +34,12 @@ body {
     overflow-y: auto;
 }
 
+.section {
+    margin-bottom: 16px;
+}
+
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 ul {
@@ -41,6 +49,14 @@ ul {
 
 li {
     margin: 0.5rem 0;
+    padding: 6px;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #eee;
+}
+
+button {
+    cursor: pointer;
 }
 
 .modal {
@@ -56,7 +72,47 @@ li {
     background: white;
     padding: 1rem;
     margin: 10% auto;
-    width: 300px;
+    width: 320px;
+    border-radius: 6px;
+}
+
+.project-extras {
+    margin-top: 12px;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.project-extras button {
+    padding: 6px 10px;
+}
+
+.permit-section {
+    background: #fff7e6;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #f0dca6;
+    max-width: 420px;
+}
+
+.permit-section ul, #maintenanceList {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+}
+
+.permit-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.gallery {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .card {
@@ -64,4 +120,30 @@ li {
     padding: 0.5rem;
     text-align: center;
     width: 150px;
+    background: #fff;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+    .sidebar {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    .main-content {
+        padding: 12px;
+    }
+    .modal-content {
+        width: 90%;
+        margin-top: 20%;
+    }
 }
