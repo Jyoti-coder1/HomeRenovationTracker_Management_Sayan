@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Improvement Tracker</title>
-    <link rel="stylesheet" href="style.css">
-    <!--jsPDF for export-->
-    
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
     <div class="container">
         <!--Sidebar Navigation-->
@@ -40,6 +40,7 @@
                         <div class="permit-section">
                             <h4>Permit Checklist</h4>
                             <ul id="permitList"></ul>
+                            <label for="newPermitName">Permit name (e.g. Building Permit)</label>
                             <input type="text" id="newPermitName" placeholder="Permit name (e.g. Building Permit)" />
                             <button id="addPermitBtn">Add Permit</button>
                         </div>
@@ -68,15 +69,18 @@
                 <h2>Inspiration</h2>
                 <div class="gallery">
                     <div class="card">
-                        <img src="https://images.pexels.com/photos/19227209/pexels-photo-19227209.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Modern Kitchen">
+                        <img src="https://images.pexels.com/photos/19227209/pexels-photo-19227209.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                            width="300" alt="Modern Kitchen" title="Modern Kitchen Design Ideas" />
                         <p>Modern Kitchen Design Ideas</p>
                     </div>
                     <div class="card">
-                        <img src="https://images.pexels.com/photos/7851906/pexels-photo-7851906.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Cozy Living Room">
+                        <img src="https://images.pexels.com/photos/7851906/pexels-photo-7851906.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                            width="300" alt="Cozy Living Room" title="Cozy Living Room Makeover" />
                         <p>Cozy Living Room Makeover</p>
                     </div>
                     <div class="card">
-                        <img src="https://images.pexels.com/photos/19227243/pexels-photo-19227243.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" width="300" alt="Bathroom Upgrade">
+                        <img src="https://images.pexels.com/photos/19227243/pexels-photo-19227243.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                            width="300" alt="Bathroom Upgrade" title="Luxury Bathroom Upgrade" />
                         <p>Luxury Bathroom Upgrade</p>
                     </div>
                 </div>
@@ -88,8 +92,11 @@
                 <ul id="maintenanceList"></ul>
 
                 <h4>Add Maintenance Task</h4>
+                <label for="maintenanceName">Task Name</label>
                 <input type="text" id="maintenanceName" placeholder="Task (e.g. Clean gutters)" />
+                <label for="maintenanceStart">Start Date</label>
                 <input type="date" id="maintenanceStart" />
+                <label for="maintenanceFreq">Frequency</label>
                 <select id="maintenanceFreq">
                     <option value="none">One-time</option>
                     <option value="monthly">Monthly</option>
@@ -101,12 +108,16 @@
         </main>
     </div>
 
-    <!--Project Modal-->   
+    <!--Project Modal-->
     <div id="projectModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Project</h3>
+            <label for="projectName">Project Name</label>
             <input type="text" id="projectName" placeholder="Project Name" />
+
+            <label for="projectBudgetInput">Budget (₹)</label>
             <input type="number" id="projectBudgetInput" placeholder="Budget (₹)" />
+
             <button id="saveProject">Save</button>
             <button onclick="closeModal('projectModal')">Cancel</button>
         </div>
@@ -116,26 +127,40 @@
     <div id="taskModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Task</h3>
+            <label for="taskName">Task Name</label>
             <input type="text" id="taskName" placeholder="Task Name" />
+
+            <label for="taskCollaborator">Collaborator Name</label>
             <input type="text" id="taskCollaborator" placeholder="Collaborator Name" />
+
+            <label for="taskPriority">Priority</label>
             <select id="taskPriority">
                 <option value="High">High</option>
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
             </select>
+
+            <label for="taskReminder">Reminder</label>
             <input type="date" id="taskReminder" />
+
+            <label for="taskPhoto">Task Photo</label>
             <input type="file" id="taskPhoto" accept="image/*" />
+
             <button id="saveTask">Save</button>
             <button onclick="closeModal('taskModal')">Cancel</button>
         </div>
     </div>
-    
+
     <!--Inventory Modal-->
     <div id="inventoryModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Inventory Item</h3>
+            <label for="inventoryName">Item Name</label>
             <input type="text" id="inventoryName" placeholder="Item Name" />
+
+            <label for="inventoryQty">Quantity</label>
             <input type="number" id="inventoryQty" placeholder="Quantity" />
+
             <button id="saveInventory">Save</button>
             <button onclick="closeModal('inventoryModal')">Cancel</button>
         </div>
@@ -145,10 +170,18 @@
     <div id="contractorModal" class="modal hidden">
         <div class="modal-content">
             <h3>New Contractor</h3>
+            <label for="contractorName">Name</label>
             <input type="text" id="contractorName" placeholder="Name" />
+
+            <label for="contractorPhone">Phone</label>
             <input type="tel" id="contractorPhone" placeholder="Phone" />
+
+            <label for="contractorEmail">Email</label>
             <input type="email" id="contractorEmail" placeholder="Email" />
+
+            <label for="contractorNotes">Notes</label>
             <textarea id="contractorNotes" placeholder="Notes"></textarea>
+
             <button id="saveContractor">Save</button>
             <button onclick="closeModal('contractorModal')">Cancel</button>
         </div>
@@ -156,4 +189,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
